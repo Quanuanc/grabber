@@ -1,5 +1,6 @@
 package cheng.grabber.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ public class FooterTag {
     private LocalDateTime createTime;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id", nullable = false, referencedColumnName = "id")
+    @JsonIgnore
     private Job job;
 
     public Job getJob() {

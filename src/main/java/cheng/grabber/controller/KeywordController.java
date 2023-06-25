@@ -1,15 +1,9 @@
 package cheng.grabber.controller;
 
-import cheng.grabber.domain.*;
+import cheng.grabber.domain.Keyword;
 import cheng.grabber.domain.vo.KeywordVo;
 import cheng.grabber.service.KeywordService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDateTime;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/keyword")
@@ -21,24 +15,20 @@ public class KeywordController {
         this.keywordService = keywordService;
     }
 
+    @GetMapping("/{id}")
+    public Keyword keyword(@PathVariable Integer id) {
+        return keywordService.findKeyword(id);
+    }
+
+    @GetMapping("/count/{keyword}")
+    public Integer getPageCount(@PathVariable String keyword) {
+        return keywordService.getPageCount(keyword);
+    }
+
     @PostMapping
-    public KeywordVo addKeyword(@RequestBody KeywordVo vo) {
-        Keyword keyword = new Keyword();
-        keyword.setKeyword(vo.getKeyword());
-        keyword.setCreateTime(LocalDateTime.now());
-        Job job = new Job();
-        InfoTag infoTag = new InfoTag();
-        FooterTag footerTag = new FooterTag();
-        CompanyTag companyTag = new CompanyTag();
-        job.addInfoTag(infoTag);
-        job.addCompanyTag(companyTag);
-        job.addFooterInfoTag(footerTag);
-        keyword.addJob(job);
+    public Keyword addKeyword(@RequestBody KeywordVo vo) {
+        Keyword keyword = keywordService.getKeywordFromZhipin(vo.getKeyword());
         keyword = keywordService.saveKeyword(keyword);
-
-        KeywordVo keywordVo = new KeywordVo();
-        BeanUtils.copyProperties(keyword, keywordVo);
-
-        return keywordVo;
+        return keyword;
     }
 }

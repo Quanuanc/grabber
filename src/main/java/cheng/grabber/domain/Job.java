@@ -1,5 +1,6 @@
 package cheng.grabber.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Job {
     private String infoDesc;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "keyword_id", nullable = false, referencedColumnName = "id")
+    @JsonIgnore
     private Keyword keyword;
 
     public Keyword getKeyword() {

@@ -26,28 +26,6 @@ public class Utils {
         String salary = ele.findElement(By.className("salary")).getText();
         String companyName = ele.findElement(By.className("company-name")).findElement(By.tagName("a")).getText();
         String infoDesc = ele.findElement(By.className("info-desc")).getText();
-        List<InfoTag> infoTagList = ele.findElement(By.className("job-info")).findElement(By.className("tag-list")).findElements(By.tagName("li")).stream().map(li -> {
-            String text = li.getText();
-            InfoTag tag = new InfoTag();
-            tag.setTag(text);
-            tag.setCreateTime(LocalDateTime.now());
-            return tag;
-        }).toList();
-        List<CompanyTag> companyTagList = ele.findElement(By.className("company-tag-list")).findElements(By.tagName("li")).stream().map(li -> {
-            String text = li.getText();
-            CompanyTag tag = new CompanyTag();
-            tag.setTag(text);
-            tag.setCreateTime(LocalDateTime.now());
-            return tag;
-        }).toList();
-        List<FooterTag> footerTagList = ele.findElement(By.className("job-card-footer")).findElement(By.className("tag-list")).findElements(By.tagName("li")).stream().map(li -> {
-            String text = li.getText();
-            FooterTag tag = new FooterTag();
-            tag.setTag(text);
-            tag.setCreateTime(LocalDateTime.now());
-            return tag;
-        }).toList();
-
 
         Job job = new Job();
         job.setName(name);
@@ -55,9 +33,28 @@ public class Utils {
         job.setSalary(salary);
         job.setCompanyName(companyName);
         job.setInfoDesc(infoDesc);
-        job.setInfoTagList(infoTagList);
-        job.setCompanyTagList(companyTagList);
-        job.setFooterTagList(footerTagList);
+
+        ele.findElement(By.className("job-info")).findElement(By.className("tag-list")).findElements(By.tagName("li")).forEach(li -> {
+            String text = li.getText();
+            InfoTag tag = new InfoTag();
+            tag.setTag(text);
+            tag.setCreateTime(LocalDateTime.now());
+            job.addInfoTag(tag);
+        });
+        ele.findElement(By.className("company-tag-list")).findElements(By.tagName("li")).forEach(li -> {
+            String text = li.getText();
+            CompanyTag tag = new CompanyTag();
+            tag.setTag(text);
+            tag.setCreateTime(LocalDateTime.now());
+            job.addCompanyTag(tag);
+        });
+        ele.findElement(By.className("job-card-footer")).findElement(By.className("tag-list")).findElements(By.tagName("li")).forEach(li -> {
+            String text = li.getText();
+            FooterTag tag = new FooterTag();
+            tag.setTag(text);
+            tag.setCreateTime(LocalDateTime.now());
+            job.addFooterInfoTag(tag);
+        });
 
         return job;
     }
