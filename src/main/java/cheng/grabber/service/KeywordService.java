@@ -49,8 +49,8 @@ public class KeywordService {
         return keywordRepository.findAll();
     }
 
-    public int getPageCount(String str) {
-        String queryParam = String.format(zhipinQueryParam, str, 1);
+    public int getPageCount(String str, String city) {
+        String queryParam = String.format(zhipinQueryParam, str, city, 1);
         Utils.waitUntilPageComplete(webDriver, zhipinBaseUrl, queryParam);
 
         WebElement optionPages = webDriver.findElement(By.className("options-pages"));
@@ -59,19 +59,20 @@ public class KeywordService {
         return lastPage;
     }
 
-    public Keyword addKeyword(String str) {
+    public Keyword addKeyword(String str, String city) {
         String queryParam;
 
-        int lastPage = getPageCount(str);
+        int lastPage = getPageCount(str, city);
 
         Keyword keyword = new Keyword();
         keyword.setKeyword(str);
+        keyword.setCity(city);
         keyword.setCreateTime(LocalDateTime.now());
 
         keywordRepository.save(keyword);
 
         for (int i = 1; i <= lastPage; i++) {
-            queryParam = String.format(zhipinQueryParam, str, i);
+            queryParam = String.format(zhipinQueryParam, str, city, i);
             Utils.waitUntilPageComplete(webDriver, zhipinBaseUrl, queryParam);
 
             WebElement jobListBox = webDriver.findElement(By.className("job-list-box"));

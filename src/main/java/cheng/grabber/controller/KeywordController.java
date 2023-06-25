@@ -20,13 +20,13 @@ public class KeywordController {
         return keywordService.findKeyword(id);
     }
 
-    @GetMapping("/count/{keyword}")
-    public Integer getPageCount(@PathVariable String keyword) {
-        return keywordService.getPageCount(keyword);
+    @GetMapping("/count/{keyword}/{city}")
+    public Integer getPageCount(@PathVariable String keyword, @PathVariable String city) {
+        return keywordService.getPageCount(keyword, city);
     }
 
     @PostMapping
     public Keyword addKeyword(@RequestBody KeywordVo vo) {
-        return keywordService.addKeyword(vo.getKeyword());
+        return keywordService.addKeyword(vo.getKeyword(), vo.getCity());
     }
 }

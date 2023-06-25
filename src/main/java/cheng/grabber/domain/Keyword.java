@@ -13,6 +13,7 @@ public class Keyword {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String keyword;
+    private String city;
     private LocalDateTime createTime;
     @OneToMany(mappedBy = "keyword", cascade = CascadeType.PERSIST)
     private List<Job> jobList;
@@ -31,6 +32,14 @@ public class Keyword {
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public LocalDateTime getCreateTime() {

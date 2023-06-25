@@ -13,6 +13,6 @@ public class CommonConfig {
 
     @Bean
     public String zhipinQueryParam() {
-        return "query=%s&page=%d";
+        return "query=%s&city=%s&page=%d";
     }
 }
