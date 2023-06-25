@@ -16,24 +16,21 @@ import java.util.List;
 public class Utils {
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
-    public static void waitUntilPageComplete(WebDriver webDriver, String url) {
+    public static void waitUntilPageComplete(WebDriver webDriver, String baseUrl, String queryParam) {
+        String url = baseUrl + "?" + queryParam;
         webDriver.get(url);
 
         int completeCount = 0;
         for (int i = 0; i < 100; i++) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            sleep(100);
             String curUrl = webDriver.getCurrentUrl();
-            log.info("curUrl: {}", curUrl);
-            if (url.equals(curUrl)) {
+            log.info("count: {}, curUrl: {}", completeCount, curUrl);
+            if (curUrl.startsWith(baseUrl)) {
                 completeCount++;
             } else {
                 completeCount = 0;
             }
-            if (completeCount >= 5) {
+            if (completeCount >= 10) {
                 break;
             }
         }
@@ -85,6 +82,14 @@ public class Utils {
         });
 
         return job;
+    }
+
+    public static void sleep(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -4,7 +4,6 @@ import cheng.grabber.domain.Job;
 import cheng.grabber.domain.Keyword;
 import cheng.grabber.repo.KeywordRepository;
 import cheng.grabber.util.Utils;
-import jakarta.annotation.Resource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,15 +17,17 @@ import java.util.List;
 @Service
 public class KeywordService {
 
-    private static final String BOSS_URL = "https://www.zhipin.com/web/geek/job?query=%s&page=%d";
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final KeywordRepository keywordRepository;
+    private final String zhipinBaseUrl;
+    private final String zhipinQueryParam;
+    private final WebDriver webDriver;
 
-    @Resource
-    private WebDriver webDriver;
-
-    public KeywordService(KeywordRepository keywordRepository) {
+    public KeywordService(KeywordRepository keywordRepository, String zhipinBaseUrl, String zhipinQueryParam, WebDriver webDriver) {
         this.keywordRepository = keywordRepository;
+        this.zhipinBaseUrl = zhipinBaseUrl;
+        this.zhipinQueryParam = zhipinQueryParam;
+        this.webDriver = webDriver;
     }
 
     public Keyword saveKeyword(Keyword keyword) {
@@ -46,8 +47,8 @@ public class KeywordService {
     }
 
     public int getPageCount(String str) {
-        String url = String.format(BOSS_URL, str, 1);
-        Utils.waitUntilPageComplete(webDriver, url);
+        String queryParam = String.format(zhipinQueryParam, str, 1);
+        Utils.waitUntilPageComplete(webDriver, zhipinBaseUrl, queryParam);
 
         WebElement optionPages = webDriver.findElement(By.className("options-pages"));
         int lastPage = Utils.getLastPageNum(optionPages);
@@ -56,7 +57,7 @@ public class KeywordService {
     }
 
     public Keyword getKeywordFromZhipin(String str) {
-        String url;
+        String queryParam;
 
         int lastPage = getPageCount(str);
 
@@ -65,8 +66,8 @@ public class KeywordService {
         keyword.setCreateTime(LocalDateTime.now());
 
         for (int i = 1; i <= lastPage; i++) {
-            url = String.format(BOSS_URL, str, i);
-            Utils.waitUntilPageComplete(webDriver, url);
+            queryParam = String.format(zhipinQueryParam, str, i);
+            Utils.waitUntilPageComplete(webDriver, zhipinBaseUrl, queryParam);
 
             WebElement jobListBox = webDriver.findElement(By.className("job-list-box"));
             List<WebElement> jobList = jobListBox.findElements(By.cssSelector("li[ka]"));
