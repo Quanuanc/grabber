@@ -12,10 +12,9 @@ import java.time.Duration;
 
 @Service
 public class GrabberService {
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
-    private final WebDriver webDriver;
     private static final String BOSS_URL = "https://www.zhipin.com/web/geek/job?query=%s&page=%d";
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final WebDriver webDriver;
 
     public GrabberService(WebDriver webDriver) {
         this.webDriver = webDriver;

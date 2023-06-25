@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "company_tag")
 public class CompanyTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,7 +13,7 @@ public class CompanyTag {
     private String tag;
     private LocalDateTime createTime;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(name = "job_id", nullable = false, referencedColumnName = "id")
     private Job job;
 
     public Job getJob() {

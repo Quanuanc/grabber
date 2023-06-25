@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "footer_tag")
 public class FooterTag {
 
     @Id
@@ -13,7 +14,7 @@ public class FooterTag {
     private String tag;
     private LocalDateTime createTime;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(name = "job_id", nullable = false, referencedColumnName = "id")
     private Job job;
 
     public Job getJob() {

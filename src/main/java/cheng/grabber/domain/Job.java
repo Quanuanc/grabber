@@ -2,9 +2,11 @@ package cheng.grabber.domain;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "job")
 public class Job {
 
     @Id
@@ -14,15 +16,15 @@ public class Job {
     private String area;
     private String salary;
     private String companyName;
-    @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST)
     private List<InfoTag> infoTagList;
-    @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST)
     private List<CompanyTag> companyTagList;
-    @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST)
     private List<FooterTag> footerTagList;
     private String infoDesc;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(name = "keyword_id", nullable = false, referencedColumnName = "id")
     private Keyword keyword;
 
     public Keyword getKeyword() {
@@ -117,5 +119,29 @@ public class Job {
                 ", footerTagList=" + footerTagList +
                 ", infoDesc='" + infoDesc + '\'' +
                 '}';
+    }
+
+    public void addInfoTag(InfoTag tag) {
+        if (this.infoTagList == null) {
+            this.infoTagList = new ArrayList<>();
+        }
+        this.infoTagList.add(tag);
+        tag.setJob(this);
+    }
+
+    public void addFooterInfoTag(FooterTag tag) {
+        if (this.footerTagList == null) {
+            this.footerTagList = new ArrayList<>();
+        }
+        this.footerTagList.add(tag);
+        tag.setJob(this);
+    }
+
+    public void addCompanyTag(CompanyTag tag) {
+        if (this.companyTagList == null) {
+            this.companyTagList = new ArrayList<>();
+        }
+        this.companyTagList.add(tag);
+        tag.setJob(this);
     }
 }

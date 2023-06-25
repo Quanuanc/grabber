@@ -16,9 +16,8 @@ import java.util.List;
 
 //@Component
 public class BossRunner implements ApplicationRunner {
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
     private static final String BOSS_URL = "https://www.zhipin.com/web/geek/job?query=%s&page=%d";
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
     public void run(ApplicationArguments args) throws InterruptedException {
