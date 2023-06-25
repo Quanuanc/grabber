@@ -2,6 +2,7 @@ package cheng.grabber.service;
 
 import cheng.grabber.domain.Job;
 import cheng.grabber.domain.Keyword;
+import cheng.grabber.repo.JobRepository;
 import cheng.grabber.repo.KeywordRepository;
 import cheng.grabber.util.Utils;
 import org.openqa.selenium.By;
@@ -18,12 +19,14 @@ import java.util.List;
 public class KeywordService {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final JobRepository jobRepository;
     private final KeywordRepository keywordRepository;
     private final String zhipinBaseUrl;
     private final String zhipinQueryParam;
     private final WebDriver webDriver;
 
-    public KeywordService(KeywordRepository keywordRepository, String zhipinBaseUrl, String zhipinQueryParam, WebDriver webDriver) {
+    public KeywordService(JobRepository jobRepository, KeywordRepository keywordRepository, String zhipinBaseUrl, String zhipinQueryParam, WebDriver webDriver) {
+        this.jobRepository = jobRepository;
         this.keywordRepository = keywordRepository;
         this.zhipinBaseUrl = zhipinBaseUrl;
         this.zhipinQueryParam = zhipinQueryParam;
@@ -56,7 +59,7 @@ public class KeywordService {
         return lastPage;
     }
 
-    public Keyword getKeywordFromZhipin(String str) {
+    public Keyword addKeyword(String str) {
         String queryParam;
 
         int lastPage = getPageCount(str);
@@ -64,6 +67,8 @@ public class KeywordService {
         Keyword keyword = new Keyword();
         keyword.setKeyword(str);
         keyword.setCreateTime(LocalDateTime.now());
+
+        keywordRepository.save(keyword);
 
         for (int i = 1; i <= lastPage; i++) {
             queryParam = String.format(zhipinQueryParam, str, i);
@@ -75,7 +80,8 @@ public class KeywordService {
             for (WebElement ele : jobList) {
                 Job job = Utils.parseJob(ele);
                 keyword.addJob(job);
-                log.info(job.toString());
+                jobRepository.save(job);
+                log.info("{} | {} | {}", job.getName(), job.getSalary(), job.getCompanyName());
             }
         }
 

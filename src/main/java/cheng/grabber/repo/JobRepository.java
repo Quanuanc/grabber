@@ -1,9 +1,9 @@
 package cheng.grabber.repo;
 
-import cheng.grabber.domain.Keyword;
+import cheng.grabber.domain.Job;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface KeywordRepository extends CrudRepository<Keyword, Integer> {
+public interface JobRepository extends CrudRepository<Job, Integer> {
 }

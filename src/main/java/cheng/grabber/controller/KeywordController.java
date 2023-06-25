@@ -27,8 +27,6 @@ public class KeywordController {
 
     @PostMapping
     public Keyword addKeyword(@RequestBody KeywordVo vo) {
-        Keyword keyword = keywordService.getKeywordFromZhipin(vo.getKeyword());
-        keyword = keywordService.saveKeyword(keyword);
-        return keyword;
+        return keywordService.addKeyword(vo.getKeyword());
     }
 }

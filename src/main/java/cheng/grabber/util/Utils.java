@@ -24,12 +24,12 @@ public class Utils {
         for (int i = 0; i < 100; i++) {
             sleep(100);
             String curUrl = webDriver.getCurrentUrl();
-            log.info("count: {}, curUrl: {}", completeCount, curUrl);
             if (curUrl.startsWith(baseUrl)) {
                 completeCount++;
             } else {
                 completeCount = 0;
             }
+            log.debug("count: {}, curUrl: {}", completeCount, curUrl);
             if (completeCount >= 10) {
                 break;
             }
