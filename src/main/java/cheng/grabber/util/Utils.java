@@ -5,12 +5,40 @@ import cheng.grabber.domain.FooterTag;
 import cheng.grabber.domain.InfoTag;
 import cheng.grabber.domain.Job;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class Utils {
+    private static final Logger log = LoggerFactory.getLogger(Utils.class);
+
+    public static void waitUntilPageComplete(WebDriver webDriver, String url) {
+        webDriver.get(url);
+
+        int completeCount = 0;
+        for (int i = 0; i < 100; i++) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            String curUrl = webDriver.getCurrentUrl();
+            log.info("curUrl: {}", curUrl);
+            if (url.equals(curUrl)) {
+                completeCount++;
+            } else {
+                completeCount = 0;
+            }
+            if (completeCount >= 5) {
+                break;
+            }
+        }
+    }
+
     public static int getLastPageNum(WebElement ele) {
         List<WebElement> aList = ele.findElements(By.tagName("a"));
         if (aList.size() > 2) {
