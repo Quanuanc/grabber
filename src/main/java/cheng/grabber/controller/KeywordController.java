@@ -1,8 +1,9 @@
 package cheng.grabber.controller;
 
 import cheng.grabber.domain.*;
+import cheng.grabber.domain.vo.KeywordVo;
 import cheng.grabber.service.KeywordService;
-import cheng.grabber.vo.KeywordVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class KeywordController {
     }
 
     @PostMapping
-    public Keyword addKeyword(@RequestBody KeywordVo vo) {
+    public KeywordVo addKeyword(@RequestBody KeywordVo vo) {
         Keyword keyword = new Keyword();
         keyword.setKeyword(vo.getKeyword());
         keyword.setCreateTime(LocalDateTime.now());
@@ -33,8 +34,11 @@ public class KeywordController {
         job.addCompanyTag(companyTag);
         job.addFooterInfoTag(footerTag);
         keyword.addJob(job);
-        keywordService.saveKeyword(keyword);
+        keyword = keywordService.saveKeyword(keyword);
 
-        return new Keyword();
+        KeywordVo keywordVo = new KeywordVo();
+        BeanUtils.copyProperties(keyword, keywordVo);
+
+        return keywordVo;
     }
 }
