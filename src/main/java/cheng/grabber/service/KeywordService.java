@@ -4,13 +4,16 @@ import cheng.grabber.domain.Job;
 import cheng.grabber.domain.Keyword;
 import cheng.grabber.repo.KeywordRepository;
 import cheng.grabber.util.Utils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import jakarta.annotation.Resource;
+import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,11 +24,11 @@ public class KeywordService {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final KeywordRepository keywordRepository;
 
-    private final WebDriver webDriver;
+    @Resource
+    private WebDriver webDriver;
 
-    public KeywordService(KeywordRepository keywordRepository, WebDriver webDriver) {
+    public KeywordService(KeywordRepository keywordRepository) {
         this.keywordRepository = keywordRepository;
-        this.webDriver = webDriver;
     }
 
     public Keyword saveKeyword(Keyword keyword) {
@@ -47,15 +50,42 @@ public class KeywordService {
     public int getPageCount(String str) {
         String url = String.format(BOSS_URL, str, 1);
         webDriver.get(url);
+
+        int completeCount = 0;
+        for (int i = 0; i < 100; i++) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            String readyState = (String) ((JavascriptExecutor) webDriver).executeScript("return document.readyState");
+            if ("complete".equals(readyState)) {
+                String curUrl = webDriver.getCurrentUrl();
+                if (url.equals(curUrl)) {
+                    completeCount++;
+                } else {
+                    completeCount = 0;
+                }
+                if (completeCount >= 10) {
+                    break;
+                }
+            }
+        }
+
+        File screenShot = ((TakesScreenshot) webDriver).getScreenshotAs(OutputType.FILE);
+        Path destPath = Path.of("C:\\Users\\pc\\Downloads\\screen.png");
         try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
+            if (Files.exists(destPath)) {
+                Files.delete(destPath);
+            }
+            Files.copy(screenShot.toPath(), destPath);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         WebElement optionPages = webDriver.findElement(By.className("options-pages"));
         int lastPage = Utils.getLastPageNum(optionPages);
-        log.info("There has {} pages about Java", lastPage);
+        log.info("There has {} pages about {}", lastPage, str);
         return lastPage;
     }
 
