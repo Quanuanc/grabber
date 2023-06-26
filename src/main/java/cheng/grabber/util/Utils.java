@@ -12,9 +12,14 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
+    private static final Pattern pattern1 = Pattern.compile("(\\d+)-(\\d+)K·(\\d+)薪");
+    private static final Pattern pattern2 = Pattern.compile("(\\d+)-(\\d+)K");
+    private static final Pattern pattern3 = Pattern.compile("(\\d+)-(\\d+)元/天");
 
     public static void waitUntilPageComplete(WebDriver webDriver, String baseUrl, String queryParam) {
         String url = baseUrl + "?" + queryParam;
@@ -56,6 +61,7 @@ public class Utils {
         job.setName(name);
         job.setArea(area);
         job.setSalary(salary);
+        parseJobSalary(job);
         job.setCompanyName(companyName);
         job.setInfoDesc(infoDesc);
 
@@ -82,6 +88,58 @@ public class Utils {
         });
 
         return job;
+    }
+
+    public static void parseJobSalary(Job job) {
+        String salary = job.getSalary();
+        int minSalary = 0, maxSalary = 0;
+        double times = 0;
+        Job.SalaryTimesType type = Job.SalaryTimesType.MONTH;
+        double annualSalaryMin = 0;
+        double annualSalaryMax = 0;
+
+        if (salary.contains("薪")) {
+            Matcher matcher = pattern1.matcher(salary);
+            if (matcher.matches()) {
+                minSalary = Integer.parseInt(matcher.group(1));
+                maxSalary = Integer.parseInt(matcher.group(2));
+                times = Integer.parseInt(matcher.group(3));
+                annualSalaryMin = minSalary * times / 10;
+                annualSalaryMax = maxSalary * times / 10;
+            } else {
+                log.error("{}", salary);
+            }
+        } else if (salary.contains("K")) {
+            Matcher matcher = pattern2.matcher(salary);
+            if (matcher.matches()) {
+                minSalary = Integer.parseInt(matcher.group(1));
+                maxSalary = Integer.parseInt(matcher.group(2));
+                times = 12;
+                annualSalaryMin = minSalary * times / 10;
+                annualSalaryMax = maxSalary * times / 10;
+            } else {
+                log.error("{}", salary);
+            }
+        } else if (salary.contains("天")) {
+            Matcher matcher = pattern3.matcher(salary);
+            if (matcher.matches()) {
+                minSalary = Integer.parseInt(matcher.group(1));
+                maxSalary = Integer.parseInt(matcher.group(2));
+                times = 21.75;
+                type = Job.SalaryTimesType.DAY;
+                annualSalaryMin = minSalary * times * 12 / 1000;
+                annualSalaryMax = maxSalary * times * 12 / 1000;
+            } else {
+                log.error("{}", salary);
+            }
+        }
+
+        job.setSalaryMin(minSalary);
+        job.setSalaryMax(maxSalary);
+        job.setSalaryTimes(times);
+        job.setSalaryTimesType(type);
+        job.setAnnualSalaryMin(annualSalaryMin);
+        job.setAnnualSalaryMax(annualSalaryMax);
     }
 
     public static void sleep(long time) {

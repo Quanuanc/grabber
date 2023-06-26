@@ -16,6 +16,12 @@ public class Job {
     private String name;
     private String area;
     private String salary;
+    private Integer salaryMin;
+    private Integer salaryMax;
+    private Double salaryTimes;
+    private SalaryTimesType salaryTimesType;
+    private Double annualSalaryMin;
+    private Double annualSalaryMax;
     private String companyName;
     @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST)
     private List<InfoTag> infoTagList;
@@ -67,6 +73,54 @@ public class Job {
 
     public void setSalary(String salary) {
         this.salary = salary;
+    }
+
+    public Integer getSalaryMin() {
+        return salaryMin;
+    }
+
+    public void setSalaryMin(Integer salaryMin) {
+        this.salaryMin = salaryMin;
+    }
+
+    public Integer getSalaryMax() {
+        return salaryMax;
+    }
+
+    public void setSalaryMax(Integer salaryMax) {
+        this.salaryMax = salaryMax;
+    }
+
+    public Double getSalaryTimes() {
+        return salaryTimes;
+    }
+
+    public void setSalaryTimes(Double salaryTimes) {
+        this.salaryTimes = salaryTimes;
+    }
+
+    public SalaryTimesType getSalaryTimesType() {
+        return salaryTimesType;
+    }
+
+    public void setSalaryTimesType(SalaryTimesType salaryTimesType) {
+        this.salaryTimesType = salaryTimesType;
+    }
+
+    public Double getAnnualSalaryMin() {
+        return annualSalaryMin;
+    }
+
+    public void setAnnualSalaryMin(Double annualSalaryMin) {
+        this.annualSalaryMin = annualSalaryMin;
+    }
+
+    public Double getAnnualSalaryMax() {
+        return annualSalaryMax;
+    }
+
+    public void setAnnualSalaryMax(Double annualSalaryMax) {
+        this.annualSalaryMax = annualSalaryMax;
     }
 
     public String getCompanyName() {
@@ -145,5 +199,10 @@ public class Job {
         }
         this.companyTagList.add(tag);
         tag.setJob(this);
+    }
+
+    public enum SalaryTimesType {
+        MONTH,
+        DAY,
     }
 }
