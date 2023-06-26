@@ -15,14 +15,10 @@ public class Job {
     private Integer id;
     private String name;
     private String area;
-    private String salary;
-    private Integer salaryMin;
-    private Integer salaryMax;
-    private Double salaryTimes;
-    private SalaryTimesType salaryTimesType;
-    private Double annualSalaryMin;
-    private Double annualSalaryMax;
     private String companyName;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "salary_id", referencedColumnName = "id")
+    private Salary salary;
     @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST)
     private List<InfoTag> infoTagList;
     @OneToMany(mappedBy = "job", cascade = CascadeType.PERSIST)
@@ -67,62 +63,6 @@ public class Job {
         this.area = area;
     }
 
-    public String getSalary() {
-        return salary;
-    }
-
-    public void setSalary(String salary) {
-        this.salary = salary;
-    }
-
-    public Integer getSalaryMin() {
-        return salaryMin;
-    }
-
-    public void setSalaryMin(Integer salaryMin) {
-        this.salaryMin = salaryMin;
-    }
-
-    public Integer getSalaryMax() {
-        return salaryMax;
-    }
-
-    public void setSalaryMax(Integer salaryMax) {
-        this.salaryMax = salaryMax;
-    }
-
-    public Double getSalaryTimes() {
-        return salaryTimes;
-    }
-
-    public void setSalaryTimes(Double salaryTimes) {
-        this.salaryTimes = salaryTimes;
-    }
-
-    public SalaryTimesType getSalaryTimesType() {
-        return salaryTimesType;
-    }
-
-    public void setSalaryTimesType(SalaryTimesType salaryTimesType) {
-        this.salaryTimesType = salaryTimesType;
-    }
-
-    public Double getAnnualSalaryMin() {
-        return annualSalaryMin;
-    }
-
-    public void setAnnualSalaryMin(Double annualSalaryMin) {
-        this.annualSalaryMin = annualSalaryMin;
-    }
-
-    public Double getAnnualSalaryMax() {
-        return annualSalaryMax;
-    }
-
-    public void setAnnualSalaryMax(Double annualSalaryMax) {
-        this.annualSalaryMax = annualSalaryMax;
-    }
-
     public String getCompanyName() {
         return companyName;
     }
@@ -163,12 +103,20 @@ public class Job {
         this.infoDesc = infoDesc;
     }
 
+    public Salary getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Salary salary) {
+        this.salary = salary;
+        salary.setJob(this);
+    }
+
     @Override
     public String toString() {
         return "Job{" +
                 "name='" + name + '\'' +
                 ", area='" + area + '\'' +
-                ", salary='" + salary + '\'' +
                 ", companyName='" + companyName + '\'' +
                 ", infoTagList=" + infoTagList +
                 ", companyTagList=" + companyTagList +
@@ -199,10 +147,5 @@ public class Job {
         }
         this.companyTagList.add(tag);
         tag.setJob(this);
-    }
-
-    public enum SalaryTimesType {
-        MONTH,
-        DAY,
     }
 }

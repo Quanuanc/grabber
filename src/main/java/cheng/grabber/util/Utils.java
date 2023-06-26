@@ -1,9 +1,6 @@
 package cheng.grabber.util;
 
-import cheng.grabber.domain.CompanyTag;
-import cheng.grabber.domain.FooterTag;
-import cheng.grabber.domain.InfoTag;
-import cheng.grabber.domain.Job;
+import cheng.grabber.domain.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -53,15 +50,15 @@ public class Utils {
     public static Job parseJob(WebElement ele) {
         String name = ele.findElement(By.className("job-name")).getText();
         String area = ele.findElement(By.className("job-area")).getText();
-        String salary = ele.findElement(By.className("salary")).getText();
+        String salaryStr = ele.findElement(By.className("salary")).getText();
         String companyName = ele.findElement(By.className("company-name")).findElement(By.tagName("a")).getText();
         String infoDesc = ele.findElement(By.className("info-desc")).getText();
 
+        Salary salary = parseJobSalary(salaryStr);
         Job job = new Job();
         job.setName(name);
         job.setArea(area);
         job.setSalary(salary);
-        parseJobSalary(job);
         job.setCompanyName(companyName);
         job.setInfoDesc(infoDesc);
 
@@ -90,16 +87,15 @@ public class Utils {
         return job;
     }
 
-    public static void parseJobSalary(Job job) {
-        String salary = job.getSalary();
+    public static Salary parseJobSalary(String salaryStr) {
         int minSalary = 0, maxSalary = 0;
         double times = 0;
-        Job.SalaryTimesType type = Job.SalaryTimesType.MONTH;
+        Salary.TimesType type = Salary.TimesType.MONTH;
         double annualSalaryMin = 0;
         double annualSalaryMax = 0;
 
-        if (salary.contains("薪")) {
-            Matcher matcher = pattern1.matcher(salary);
+        if (salaryStr.contains("薪")) {
+            Matcher matcher = pattern1.matcher(salaryStr);
             if (matcher.matches()) {
                 minSalary = Integer.parseInt(matcher.group(1));
                 maxSalary = Integer.parseInt(matcher.group(2));
@@ -107,10 +103,10 @@ public class Utils {
                 annualSalaryMin = minSalary * times / 10;
                 annualSalaryMax = maxSalary * times / 10;
             } else {
-                log.error("{}", salary);
+                log.error("{}", salaryStr);
             }
-        } else if (salary.contains("K")) {
-            Matcher matcher = pattern2.matcher(salary);
+        } else if (salaryStr.contains("K")) {
+            Matcher matcher = pattern2.matcher(salaryStr);
             if (matcher.matches()) {
                 minSalary = Integer.parseInt(matcher.group(1));
                 maxSalary = Integer.parseInt(matcher.group(2));
@@ -118,28 +114,31 @@ public class Utils {
                 annualSalaryMin = minSalary * times / 10;
                 annualSalaryMax = maxSalary * times / 10;
             } else {
-                log.error("{}", salary);
+                log.error("{}", salaryStr);
             }
-        } else if (salary.contains("天")) {
-            Matcher matcher = pattern3.matcher(salary);
+        } else if (salaryStr.contains("天")) {
+            Matcher matcher = pattern3.matcher(salaryStr);
             if (matcher.matches()) {
                 minSalary = Integer.parseInt(matcher.group(1));
                 maxSalary = Integer.parseInt(matcher.group(2));
                 times = 21.75;
-                type = Job.SalaryTimesType.DAY;
+                type = Salary.TimesType.DAY;
                 annualSalaryMin = minSalary * times * 12 / 1000;
                 annualSalaryMax = maxSalary * times * 12 / 1000;
             } else {
-                log.error("{}", salary);
+                log.error("{}", salaryStr);
             }
         }
 
-        job.setSalaryMin(minSalary);
-        job.setSalaryMax(maxSalary);
-        job.setSalaryTimes(times);
-        job.setSalaryTimesType(type);
-        job.setAnnualSalaryMin(annualSalaryMin);
-        job.setAnnualSalaryMax(annualSalaryMax);
+        Salary salary = new Salary();
+        salary.setStr(salaryStr);
+        salary.setMin(minSalary);
+        salary.setMax(maxSalary);
+        salary.setTimes(times);
+        salary.setTimesType(type);
+        salary.setAnnualMin(annualSalaryMin);
+        salary.setAnnualMax(annualSalaryMax);
+        return salary;
     }
 
     public static void sleep(long time) {
