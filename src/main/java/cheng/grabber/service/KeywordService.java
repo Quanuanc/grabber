@@ -10,10 +10,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class KeywordService {
@@ -24,13 +26,15 @@ public class KeywordService {
     private final String zhipinBaseUrl;
     private final String zhipinQueryParam;
     private final WebDriver webDriver;
+    private final Map<String, String> cityMap;
 
-    public KeywordService(JobRepository jobRepository, KeywordRepository keywordRepository, String zhipinBaseUrl, String zhipinQueryParam, WebDriver webDriver) {
+    public KeywordService(JobRepository jobRepository, KeywordRepository keywordRepository, String zhipinBaseUrl, String zhipinQueryParam, WebDriver webDriver, @Qualifier("cityMap") Map<String, String> cityMap) {
         this.jobRepository = jobRepository;
         this.keywordRepository = keywordRepository;
         this.zhipinBaseUrl = zhipinBaseUrl;
         this.zhipinQueryParam = zhipinQueryParam;
         this.webDriver = webDriver;
+        this.cityMap = cityMap;
     }
 
     public Keyword saveKeyword(Keyword keyword) {
@@ -50,7 +54,10 @@ public class KeywordService {
     }
 
     public int getPageCount(String str, String city) {
-        String queryParam = String.format(zhipinQueryParam, str, city, 1);
+        String cityCode = cityMap.getOrDefault(city, null);
+        if (cityCode == null) return 0;
+
+        String queryParam = String.format(zhipinQueryParam, str, cityCode, 1);
         Utils.waitUntilPageComplete(webDriver, zhipinBaseUrl, queryParam);
 
         WebElement optionPages = webDriver.findElement(By.className("options-pages"));
@@ -60,6 +67,9 @@ public class KeywordService {
     }
 
     public Keyword addKeyword(String str, String city) {
+        String cityCode = cityMap.getOrDefault(city, null);
+        if (cityCode == null) return new Keyword();
+
         String queryParam;
 
         int lastPage = getPageCount(str, city);
@@ -72,7 +82,7 @@ public class KeywordService {
         keywordRepository.save(keyword);
 
         for (int i = 1; i <= lastPage; i++) {
-            queryParam = String.format(zhipinQueryParam, str, city, i);
+            queryParam = String.format(zhipinQueryParam, str, cityCode, i);
             Utils.waitUntilPageComplete(webDriver, zhipinBaseUrl, queryParam);
 
             WebElement jobListBox = webDriver.findElement(By.className("job-list-box"));
