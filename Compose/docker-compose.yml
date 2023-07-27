@@ -1,0 +1,14 @@
+name: grabber
+version: "3"
+
+services:
+  db:
+    image: mysql:oracle
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=008855
+      - MYSQL_USER=grabber
+      - MYSQL_PASSWORD=grabber
+      - MYSQL_DATABASE=grabber
+    ports:
+      - "3306:3306"
